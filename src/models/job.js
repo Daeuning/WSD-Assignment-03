@@ -12,6 +12,6 @@ const jobSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   views: { type: Number, default: 0 },
   applications: { type: Number, default: 0 },
-});
+}, { collection: 'job' }); // 컬렉션명을 'job'으로 명시
 
 module.exports = mongoose.model('Job', jobSchema);
