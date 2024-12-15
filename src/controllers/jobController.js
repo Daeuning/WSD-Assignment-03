@@ -84,3 +84,107 @@ exports.getJobById = async (req, res) => {
     errorResponse(res, error.message, '공고 상세 조회 실패');
   }
 };
+
+exports.createJob = async (req, res) => {
+  try {
+    const {
+      title,
+      company_id,
+      experience,
+      education,
+      employment_type,
+      salary,
+      stack_tags,
+      deadline,
+    } = req.body;
+
+    // 필수 입력 값 확인
+    if (!title || !company_id || !experience || !employment_type || !salary || !stack_tags || !deadline) {
+      return errorResponse(res, null, '모든 필드를 입력해주세요.');
+    }
+
+    // 회사 존재 여부 확인
+    const company = await Company.findById(company_id);
+    if (!company) {
+      return errorResponse(res, null, '존재하지 않는 회사 ID입니다.');
+    }
+
+    // 새로운 Job 생성
+    const job = new Job({
+      title,
+      company: company_id,
+      experience,
+      education,
+      employment_type,
+      salary,
+      stack_tags: stack_tags.split(',').map(tag => tag.trim()),
+      deadline,
+    });
+
+    await job.save();
+
+    successResponse(res, job, '채용 공고가 성공적으로 등록되었습니다.');
+  } catch (error) {
+    console.error('공고 등록 에러:', error);
+    errorResponse(res, error.message, '공고 등록 실패');
+  }
+};
+
+exports.updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // 업데이트 가능한 필드만 필터링
+    const allowedUpdates = [
+      'title',
+      'experience',
+      'education',
+      'employment_type',
+      'salary',
+      'stack_tags',
+      'deadline',
+    ];
+    const updateKeys = Object.keys(updates);
+
+    const isValidUpdate = updateKeys.every(key => allowedUpdates.includes(key));
+    if (!isValidUpdate) {
+      return errorResponse(res, null, '업데이트할 수 없는 필드가 포함되어 있습니다.');
+    }
+
+    // Job 업데이트
+    const job = await Job.findByIdAndUpdate(
+      id,
+      {
+        ...updates,
+        ...(updates.stack_tags && { stack_tags: updates.stack_tags.split(',').map(tag => tag.trim()) }),
+      },
+      { new: true, runValidators: true } // 변경된 데이터 반환
+    );
+
+    if (!job) {
+      return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
+    }
+
+    successResponse(res, job, '공고가 성공적으로 수정되었습니다.');
+  } catch (error) {
+    console.error('공고 수정 에러:', error);
+    errorResponse(res, error.message, '공고 수정 실패');
+  }
+};
+
+exports.deleteJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findByIdAndDelete(id);
+    if (!job) {
+      return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
+    }
+
+    successResponse(res, null, '공고가 성공적으로 삭제되었습니다.');
+  } catch (error) {
+    console.error('공고 삭제 에러:', error);
+    errorResponse(res, error.message, '공고 삭제 실패');
+  }
+};
