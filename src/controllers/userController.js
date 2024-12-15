@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { successResponse, errorResponse } = require('../views/userView');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 exports.register = async (req, res) => {
   try {
@@ -43,25 +44,70 @@ exports.login = async (req, res) => {
     }
 
     const decodedPassword = Buffer.from(user.password, 'base64').toString('utf8');
-
     if (password !== decodedPassword) {
       return errorResponse(res, null, '비밀번호가 일치하지 않습니다.');
     }
 
-    // JWT 토큰 발급
-    const token = jwt.sign(
-      { userId: user._id, email: user.email }, // 토큰에 포함할 정보
-      'your_secret_key', // 비밀키
-      { expiresIn: '1h' } // 토큰 유효 기간
+    // Access 토큰 발급
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      'your_secret_key',
+      { expiresIn: '15m' } // Access 토큰은 15분 유효
     );
 
-    // 로그인 성공 - 로그인 시간 업데이트
-    user.login_history = new Date();
+    // Refresh 토큰 발급
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+
+    // Refresh 토큰 저장 (DB나 메모리에 저장 가능)
+    user.refresh_token = refreshToken;
     await user.save();
 
-    successResponse(res, { token, email: user.email }, '로그인 성공');
+    successResponse(res, { accessToken, refreshToken }, '로그인 성공');
   } catch (error) {
     errorResponse(res, error.message, '로그인 실패');
+  }
+};
+
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return errorResponse(res, null, 'Refresh 토큰이 필요합니다.');
+    }
+
+    // Refresh 토큰 검증
+    const user = await User.findOne({ refresh_token: refreshToken });
+    if (!user) {
+      return errorResponse(res, null, '유효하지 않은 Refresh 토큰입니다.');
+    }
+
+    // 새로운 Access 토큰 발급
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      'your_secret_key',
+      { expiresIn: '15m' } // Access 토큰은 15분 유효
+    );
+
+    successResponse(res, { accessToken }, '토큰 갱신 성공');
+  } catch (error) {
+    errorResponse(res, error.message, '토큰 갱신 실패');
+  }
+};
+
+exports.authenticate = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: '토큰이 필요합니다.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, 'your_secret_key');
+    req.user = decoded; // req.user에 사용자 정보 저장
+    next();
+  } catch (error) {
+    res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
   }
 };
 
@@ -81,11 +127,69 @@ exports.getUserInfo = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId; // 인증 미들웨어에서 추가된 사용자 정보
+    const { email, password, newPassword } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return errorResponse(res, null, '사용자를 찾을 수 없습니다.');
+    }
+
+    // 비밀번호 변경
+    if (password && newPassword) {
+      const decodedPassword = Buffer.from(user.password, 'base64').toString('utf8');
+      if (password !== decodedPassword) {
+        return errorResponse(res, null, '현재 비밀번호가 일치하지 않습니다.');
+      }
+
+      user.password = Buffer.from(newPassword).toString('base64');
+    }
+
+    // 이메일 업데이트
+    if (email) {
+      user.email = email;
+    }
+
+    await user.save();
+
+    successResponse(res, { email: user.email }, '회원 정보 수정 성공');
+  } catch (error) {
+    errorResponse(res, error.message, '회원 정보 수정 실패');
+  }
+};
+
+
+// 회원 정보 조회
+exports.getUserInfo = async (req, res) => {
+  try {
+    const userId = req.user.userId; // 인증 미들웨어를 통해 토큰에서 추출된 사용자 ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return errorResponse(res, null, '사용자를 찾을 수 없습니다.');
+    }
+
+    successResponse(res, {
+      email: user.email,
+      login_history: user.login_history,
+    }, '회원 정보 조회 성공');
+  } catch (error) {
+    errorResponse(res, error.message, '회원 정보 조회 실패');
+  }
+};
+
 // 회원 탈퇴
 exports.deleteUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    await User.findByIdAndDelete(userId);
+    const userId = req.user.userId; // 인증 미들웨어를 통해 토큰에서 추출된 사용자 ID
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return errorResponse(res, null, '사용자를 찾을 수 없습니다.');
+    }
 
     successResponse(res, null, '회원 탈퇴 성공');
   } catch (error) {
