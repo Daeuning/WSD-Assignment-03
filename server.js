@@ -4,6 +4,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const userRoutes = require('./src/routes/userRoutes');
 const jobRoutes = require('./src/routes/jobRoutes')
+const applicationRoutes = require('./src/routes/applicationRoutes');
 const swaggerSpec = require('./src/config/swagger'); 
 const swaggerUi = require('swagger-ui-express');
 
@@ -30,6 +31,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 사용자 관련 라우트 추가
+app.use('/applications', applicationRoutes);
 app.use('/auth', userRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Swagger UI 경로
