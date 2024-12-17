@@ -22,6 +22,11 @@ const JobStatisticsSchema = new mongoose.Schema({
     type: Number,
     default: 0, // 초기 북마크 수는 0
     min: 0
+  },
+  favorite_count: {
+    type: Number,
+    default: 0, // 초기 관심 공고 수는 0
+    min: 0
   }
 });
 
