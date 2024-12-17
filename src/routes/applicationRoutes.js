@@ -9,7 +9,7 @@ const router = express.Router();
  * /applications:
  *   post:
  *     summary: 지원하기
- *     description: 공고에 지원합니다.
+ *     description: 특정 공고에 지원합니다.
  *     tags:
  *       - Applications
  *     requestBody:
@@ -21,9 +21,17 @@ const router = express.Router();
  *             properties:
  *               jobId:
  *                 type: string
+ *                 description: 지원할 공고의 ID
+ *                 example: "60f5c4e2d5e44b3b4c8f1c45"
  *     responses:
  *       201:
  *         description: 지원이 완료되었습니다.
+ *       400:
+ *         description: 잘못된 입력 또는 중복 지원
+ *       404:
+ *         description: 해당 공고를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 에러
  */
 router.post('/', authenticate, applicationController.applyJob);
 

@@ -1,12 +1,13 @@
 const Application = require('../models/Application');
 const Job = require('../models/Job');
-const { successResponse, errorResponse } = require('../views/jobView');
+const JobStatistics = require('../models/JobStatistics');
+const { successResponse, errorResponse } = require('../views/applicationView');
 
 // 지원하기
 exports.applyJob = async (req, res) => {
   try {
     const { jobId } = req.body;
-    const userId = req.user.userId; // <-- 여기서 userId 사용
+    const userId = req.user.userId; // 인증 미들웨어에서 가져온 userId
 
     // 필수 입력값 확인
     if (!jobId) {
@@ -26,8 +27,18 @@ exports.applyJob = async (req, res) => {
     }
 
     // 지원 정보 저장
-    const application = new Application({ job: jobId, user: userId });
+    const application = new Application({
+      job: jobId,
+      user: userId,
+    });
     await application.save();
+
+    // JobStatistics의 applications 값 1 증가
+    await JobStatistics.findOneAndUpdate(
+      { job_id: jobId },
+      { $inc: { applications: 1 } },
+      { upsert: true, new: true } // 만약 통계가 없다면 새로 생성
+    );
 
     successResponse(res, application, '지원이 완료되었습니다.');
   } catch (error) {
