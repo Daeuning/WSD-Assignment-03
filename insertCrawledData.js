@@ -47,14 +47,32 @@ const parseDate = (text) => {
 };
 
 // "마감일"을 날짜로 변환하는 함수
-const parseDeadline = (text) => {
+const parseDeadline = (text, created_at) => {
   if (!text || text.includes('채용시')) return null; // "채용시" 또는 빈 값은 null 반환
+
+  // created_at 유효성 검사
+  const baseDate = created_at instanceof Date && !isNaN(created_at.getTime()) 
+    ? created_at 
+    : new Date(); // created_at이 유효하지 않으면 현재 날짜 사용
+
+  const currentYear = baseDate.getFullYear(); // 기준 연도 가져오기
+  const cleanedText = text.replace('~ ', '').trim(); // "~ " 제거
   
-  const cleanedText = text.replace('~ ', '2024-').trim(); // "~ " 제거하고 연도 붙이기
-  const date = new Date(cleanedText);
-  
-  return isNaN(date.getTime()) ? null : date; // 유효하지 않은 날짜는 null 반환
+  // 월과 일을 두 자리 숫자로 보장
+  const [month, day] = cleanedText.split('/').map((num) => num.padStart(2, '0'));
+
+  let deadlineDate = new Date(`${currentYear}-${month}-${day}`); // ISO 형식 날짜 생성
+
+  // 만약 created_at보다 deadline이 작다면 연도를 다음 해로 설정
+  if (deadlineDate < baseDate) {
+    const nextYear = currentYear + 1;
+    deadlineDate = new Date(`${nextYear}-${month}-${day}`);
+  }
+
+  return isNaN(deadlineDate.getTime()) ? null : deadlineDate; // 유효하지 않은 날짜는 null 반환
 };
+
+
 
 // 데이터 삽입 함수
 const insertCrawledData = async () => {
@@ -84,6 +102,7 @@ const insertCrawledData = async () => {
           console.log(`🔄 회사 중복: ${company.company_name}`);
         }
 
+        const createdAt = parseDate(item['등록일']) || new Date();
         // 2. 채용공고 정보 정제 및 저장
         const jobData = {
           title: cleanText(item['제목']),
@@ -95,13 +114,17 @@ const insertCrawledData = async () => {
           employment_type: cleanText(item['고용형태']),
           job_tag: cleanText(item['태그']),
           stack_tags: Array.isArray(item['직무분야'])
-            ? item['직무분야'].map(tag => cleanText(tag))
-            : cleanText(item['직무분야'])
-                .split(',')
-                .map((tag) => tag.trim())
-                .filter((tag) => tag), // 태그 정제
-          deadline: parseDeadline(item['마감일']), // 날짜 검증 후 설정
-          created_at: parseDate(item['등록일']) || new Date(), // 날짜가 유효하지 않으면 현재 날짜
+          ? item['직무분야']
+              .map(tag => cleanText(tag.replace(/수정일.*$/, '').replace(/\s+외.*$/, '').trim())) // '수정일' 및 '외' 뒤 제거
+              .filter(tag => tag) // 빈 태그 제거
+          : cleanText(item['직무분야'])
+              .replace(/수정일.*$/, '') // '수정일' 및 그 뒤 텍스트 제거
+              .replace(/\s+외.*$/, '')  // '외'와 그 뒤 텍스트 제거
+              .split(',')
+              .map(tag => tag.trim())
+              .filter(tag => tag), // 빈 태그 제거
+          deadline: parseDeadline(item['마감일'] , createdAt), // 날짜 검증 후 설정
+          created_at: createdAt, // 날짜가 유효하지 않으면 현재 날짜
         };    
 
         const existingJob = await Job.findOne({ title: jobData.title, company: company._id });
