@@ -2,12 +2,11 @@ const Job = require('../models/Job');
 const Company = require('../models/Company');
 const { successResponse, errorResponse } = require('../views/jobView');
 
-// 공고 목록 조회 (페이지네이션, 필터링, 정렬)
-// 공고 목록 조회 (필터링 + 페이지네이션)
+// 공고 목록 조회 (필터링 + 페이지네이션 + 정렬)
 exports.getJobs = async (req, res) => {
   try {
     // Query 파라미터 받기
-    const { page = 1, location, experience, salary, stack_tags } = req.query;
+    const { page = 1, location, experience, salary, stack_tags, sortBy = 'created_at', order = 'desc' } = req.query;
 
     // 페이지네이션 설정
     const currentPage = Math.max(1, parseInt(page)); // 최소값 1 보장
@@ -26,14 +25,19 @@ exports.getJobs = async (req, res) => {
       filters.stack_tags = { $in: stack_tags.split(',').map(tag => tag.trim()) }; // 일부 태그 일치
     }
 
+    // 정렬 조건 설정
+    const sortOptions = {};
+    sortOptions[sortBy] = order === 'desc' ? -1 : 1;
+
     // 전체 데이터 수 계산
     const totalItems = await Job.countDocuments(filters);
     const totalPages = Math.ceil(totalItems / limit);
 
-    // 필터링 및 페이지네이션된 데이터 가져오기
+    // 필터링 및 페이지네이션된 데이터 가져오기 + 정렬
     const jobs = await Job.find(filters)
-      .skip(skip)          // 건너뛰기
-      .limit(limit);       // 페이지 크기
+      .sort(sortOptions)  // 정렬 적용
+      .skip(skip)         // 건너뛰기
+      .limit(limit);      // 페이지 크기
 
     // 응답 반환
     res.status(200).json({
@@ -44,6 +48,10 @@ exports.getJobs = async (req, res) => {
         totalPages,
         totalItems,
         pageSize: limit,
+      },
+      sort: {
+        sortBy,
+        order,
       },
     });
   } catch (error) {

@@ -28,16 +28,22 @@ const cleanText = (text) => {
 // "등록일"을 날짜로 변환하는 함수
 const parseDate = (text) => {
   if (!text) return null; // text가 비어있으면 null 반환
-  
-  const cleanedText = text.replace(/등록일\s?/g, '').trim(); // '등록일' 제거
+
+  // 한글 제거: 숫자, /, 공백, 특수문자 제외 나머지 제거
+  const cleanedText = text.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '').trim(); 
+
+  // 날짜를 / 기준으로 분리
   const dateParts = cleanedText.split('/'); // '24/12/16' 형태를 분리
   
   if (dateParts.length === 3) {
+    // 연도를 '20'과 결합하여 ISO 형식으로 변환
     const date = new Date(`20${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`);
-    return isNaN(date.getTime()) ? null : date; // 유효하지 않은 날짜 확인
+    
+    // 유효한 날짜인지 확인
+    return isNaN(date.getTime()) ? null : date;
   }
-  
-  return null; // 유효하지 않은 포맷인 경우
+
+  return null; // 유효하지 않은 포맷인 경우 null 반환
 };
 
 // "마감일"을 날짜로 변환하는 함수
