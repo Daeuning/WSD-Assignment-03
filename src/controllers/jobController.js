@@ -195,7 +195,7 @@ exports.createJob = async (req, res) => {
     } = req.body;
 
     // 필수 입력 값 검증
-    if (!title || !company_name || !experience || !employment_type || !salary || !stack_tags || !deadline || !link) {
+    if (!title || !company_name || !experience || !employment_type || !stack_tags || !deadline || !link) {
       return errorResponse(res, null, '모든 필수 필드를 입력해주세요.');
     }
 
@@ -227,7 +227,6 @@ exports.createJob = async (req, res) => {
       experience,
       education: education || '',
       employment_type,
-      salary,
       stack_tags: stack_tags.split(',').map(tag => tag.trim()),
       deadline: parsedDeadline,
       link, // 링크 추가
@@ -242,43 +241,68 @@ exports.createJob = async (req, res) => {
   }
 };
 
+
+// 공고 수정
 exports.updateJob = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updates = req.body;
+    const { id } = req.params; // 공고 ID
+    const updates = req.body; // 업데이트할 데이터
 
-    // 업데이트 가능한 필드만 필터링
+    // 업데이트 가능한 필드 목록
     const allowedUpdates = [
       'title',
       'experience',
       'education',
       'employment_type',
-      'salary',
       'stack_tags',
       'deadline',
     ];
-    const updateKeys = Object.keys(updates);
 
+    // 업데이트 필드 검증
+    const updateKeys = Object.keys(updates);
     const isValidUpdate = updateKeys.every(key => allowedUpdates.includes(key));
     if (!isValidUpdate) {
       return errorResponse(res, null, '업데이트할 수 없는 필드가 포함되어 있습니다.');
     }
 
-    // Job 업데이트
+    // 마감일 검증
+    if (updates.deadline) {
+      const parsedDeadline = new Date(updates.deadline);
+      if (isNaN(parsedDeadline.getTime()) || parsedDeadline < new Date()) {
+        return errorResponse(res, null, '유효한 마감일을 입력해주세요. 마감일은 현재 날짜 이후여야 합니다.');
+      }
+      updates.deadline = parsedDeadline;
+    }
+
+    // 스택 태그 배열 처리
+    if (updates.stack_tags) {
+      updates.stack_tags = updates.stack_tags.split(',').map(tag => tag.trim());
+    }
+
+    // 채용 공고 업데이트
     const job = await Job.findByIdAndUpdate(
       id,
-      {
-        ...updates,
-        ...(updates.stack_tags && { stack_tags: updates.stack_tags.split(',').map(tag => tag.trim()) }),
-      },
-      { new: true, runValidators: true } // 변경된 데이터 반환
+      { ...updates },
+      { new: true, runValidators: true }
     );
 
     if (!job) {
       return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
     }
 
-    successResponse(res, job, '공고가 성공적으로 수정되었습니다.');
+    // JobStatistics 존재 여부 확인 후 초기화 (옵션: 필요 시 수정)
+    let jobStatistics = await JobStatistics.findOne({ job_id: job._id });
+    if (!jobStatistics) {
+      jobStatistics = new JobStatistics({
+        job_id: job._id,
+        views: 0,
+        applications: 0,
+        bookmark_count: 0,
+      });
+      await jobStatistics.save();
+    }
+
+    successResponse(res, { job, jobStatistics }, '공고가 성공적으로 수정되었습니다.');
   } catch (error) {
     console.error('공고 수정 에러:', error);
     errorResponse(res, error.message, '공고 수정 실패');

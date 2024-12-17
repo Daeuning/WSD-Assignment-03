@@ -221,11 +221,17 @@ router.post('/', authenticate, jobController.createJob);
  *                 type: string
  *               stack_tags:
  *                 type: string
+ *                 description: 콤마(,)로 구분된 스택 태그
  *               deadline:
  *                 type: string
+ *                 description: 마감일 (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: 공고 수정 성공
+ *       400:
+ *         description: 요청 실패 (유효하지 않은 입력 등)
+ *       404:
+ *         description: 공고를 찾을 수 없음
  */
 router.put('/:id', authenticate, jobController.updateJob);
 
