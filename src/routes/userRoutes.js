@@ -14,7 +14,7 @@ const router = express.Router();
  * /auth/register:
  *   post:
  *     summary: 사용자 회원가입
- *     description: 이메일과 비밀번호를 통해 새로운 사용자를 생성합니다.
+ *     description: 이메일과 비밀번호를 통해 새로운 사용자를 생성합니다. 자기소개(bio)를 추가할 수 있습니다.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -30,6 +30,9 @@ const router = express.Router();
  *               password:
  *                 type: string
  *                 description: 사용자 비밀번호
+ *               bio:
+ *                 type: string
+ *                 description: 짧은 자기소개 (선택사항)
  *     responses:
  *       200:
  *         description: 성공적으로 회원가입됨.
@@ -129,34 +132,36 @@ router.put('/profile', authenticate, userController.updateProfile);
 
 /**
  * @swagger
- * /auth/user-info:
- *   get:
- *     summary: 회원 정보 조회
- *     description: 인증된 사용자의 이메일과 로그인 기록을 반환합니다.
+ * /auth/profile:
+ *   put:
+ *     summary: 회원 정보 수정
+ *     description: 사용자 인증 후 이메일, 비밀번호 또는 자기소개(bio)를 수정합니다.
  *     tags:
  *       - Auth
  *     security:
  *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 새 이메일
+ *               password:
+ *                 type: string
+ *                 description: 현재 비밀번호
+ *               newPassword:
+ *                 type: string
+ *                 description: 새 비밀번호
+ *               bio:
+ *                 type: string
+ *                 description: 새 자기소개
  *     responses:
  *       200:
- *         description: 회원 정보 조회 성공.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                     login_history:
- *                       type: string
- *                       format: date-time
+ *         description: 회원 정보 수정 성공.
  *       401:
  *         description: 인증 실패.
  */

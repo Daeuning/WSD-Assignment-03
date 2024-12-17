@@ -3,9 +3,10 @@ const { successResponse, errorResponse } = require('../views/userView');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
+// 회원가입
 exports.register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, bio } = req.body; // bio 필드 추가
 
     // 이메일 형식 검증
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -23,6 +24,7 @@ exports.register = async (req, res) => {
     const newUser = new User({
       email,
       password: encodedPassword,
+      bio: bio || '', // bio 기본값 빈 문자열 처리
     });
 
     await newUser.save();
@@ -32,6 +34,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ success: false, message: '회원 가입 실패', error: error.message });
   }
 };
+
 
 // 로그인
 exports.login = async (req, res) => {
@@ -68,6 +71,7 @@ exports.login = async (req, res) => {
   }
 };
 
+//refresh 토큰
 exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -95,6 +99,7 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
+// authenticate
 exports.authenticate = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -127,10 +132,11 @@ exports.getUserInfo = async (req, res) => {
   }
 };
 
+//프로필수정
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.userId; // 인증 미들웨어에서 추가된 사용자 정보
-    const { email, password, newPassword } = req.body;
+    const { email, password, newPassword, bio } = req.body; // bio 필드 추가
 
     const user = await User.findById(userId);
 
@@ -144,7 +150,6 @@ exports.updateProfile = async (req, res) => {
       if (password !== decodedPassword) {
         return errorResponse(res, null, '현재 비밀번호가 일치하지 않습니다.');
       }
-
       user.password = Buffer.from(newPassword).toString('base64');
     }
 
@@ -153,9 +158,14 @@ exports.updateProfile = async (req, res) => {
       user.email = email;
     }
 
+    // bio 업데이트
+    if (bio !== undefined) {
+      user.bio = bio;
+    }
+
     await user.save();
 
-    successResponse(res, { email: user.email }, '회원 정보 수정 성공');
+    successResponse(res, { email: user.email, bio: user.bio }, '회원 정보 수정 성공');
   } catch (error) {
     errorResponse(res, error.message, '회원 정보 수정 실패');
   }
@@ -175,6 +185,7 @@ exports.getUserInfo = async (req, res) => {
     successResponse(res, {
       email: user.email,
       login_history: user.login_history,
+      bio: user.bio, // bio 추가
     }, '회원 정보 조회 성공');
   } catch (error) {
     errorResponse(res, error.message, '회원 정보 조회 실패');

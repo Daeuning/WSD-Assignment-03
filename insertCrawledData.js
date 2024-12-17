@@ -10,7 +10,7 @@ require('dotenv').config(); // 환경 변수 설정
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGO_URI)
   .then(() => console.log('MongoDB 연결 성공'))
   .catch((err) => console.error('MongoDB 연결 실패:', err));
 

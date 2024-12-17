@@ -9,8 +9,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:8080', // 로컬 서버 URL
-      description: 'Local server',
+      url: 'http://113.198.66.75:18027', // 외부 서버 URL (포트 변경)
+      description: 'External server (Public)',
     },
   ],
   components: {
@@ -19,14 +19,10 @@ const swaggerDefinition = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT', // 토큰 형식 명시
+        description: 'Enter JWT token for authentication. Example: Bearer <token>',
       },
     },
   },
-  security: [
-    {
-      BearerAuth: [], // 모든 API에 Bearer 인증 추가
-    },
-  ],
 };
 
 const options = {
@@ -34,6 +30,7 @@ const options = {
   apis: ['./src/routes/*.js'], // API 문서화 대상 파일 경로 (라우트 파일)
 };
 
+// Swagger JSDoc 설정
 const swaggerSpec = swaggerJSDoc(options);
 
 module.exports = swaggerSpec;
