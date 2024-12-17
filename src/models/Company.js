@@ -35,7 +35,6 @@ const CompanySchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { timestamps: true } // 생성 및 수정 시간 자동 추가
 );
 
 // Company 모델 생성

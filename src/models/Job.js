@@ -60,7 +60,6 @@ const JobSchema = new mongoose.Schema(
       ref: 'Statistics', // 통계 테이블과 연결 (옵션)
     },
   },
-  { timestamps: true } // 생성 및 수정 시간 자동 추가
 );
 
 // 중복 방지: 제목과 회사가 동일한 경우 중복되지 않도록 설정
