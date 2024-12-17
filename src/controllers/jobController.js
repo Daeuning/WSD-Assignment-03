@@ -3,6 +3,7 @@ const Job = require('../models/Job');
 const Company = require('../models/Company');
 const SearchHistory = require('../models/SearchHistory');
 const JobStatistics = require('../models/JobStatistics');
+const JobReview = require('../models/JobReview');
 const { successResponse, errorResponse } = require('../views/jobView');
 
 // 검색 기록 저장 함수
@@ -334,5 +335,47 @@ exports.deleteJob = async (req, res) => {
   } catch (error) {
     console.error('공고 삭제 에러:', error);
     errorResponse(res, error.message, '공고 삭제 실패');
+  }
+};
+
+
+// 리뷰 작성 기능
+exports.createReview = async (req, res) => {
+  try {
+    const { id } = req.params; // 공고 ID
+    const { rating, comment } = req.body;
+    const userId = req.user.userId; // JWT 미들웨어에서 전달된 사용자 ID
+
+    // 필수값 확인
+    if (!rating || rating < 1 || rating > 5) {
+      return errorResponse(res, null, '평점은 1에서 5 사이의 값이어야 합니다.');
+    }
+
+    // 공고 존재 여부 확인
+    const job = await Job.findById(id);
+    if (!job) {
+      return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
+    }
+
+    // 기존 리뷰 확인 (중복 방지)
+    const existingReview = await JobReview.findOne({ job_id: id, user_id: userId });
+    if (existingReview) {
+      return errorResponse(res, null, '이미 해당 공고에 리뷰를 작성하셨습니다.');
+    }
+
+    // 새로운 리뷰 생성
+    const review = new JobReview({
+      job_id: id,
+      user_id: userId,
+      rating,
+      comment,
+    });
+
+    await review.save();
+
+    successResponse(res, review, '리뷰가 성공적으로 작성되었습니다.');
+  } catch (error) {
+    console.error('리뷰 작성 에러:', error.message);
+    errorResponse(res, error.message, '리뷰 작성 실패');
   }
 };

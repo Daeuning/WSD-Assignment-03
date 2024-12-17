@@ -261,4 +261,45 @@ router.put('/:id', authenticate, jobController.updateJob);
 
 router.delete('/:id', authenticate, jobController.deleteJob);
 
+/**
+ * @swagger
+ * /jobs/{id}/reviews:
+ *   post:
+ *     summary: 리뷰 작성
+ *     description: 특정 채용 공고에 리뷰를 작성합니다.
+ *     tags:
+ *       - Reviews
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 공고 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: number
+ *                 description: 평점 (1~5)
+ *               comment:
+ *                 type: string
+ *                 description: 리뷰 내용
+ *     responses:
+ *       201:
+ *         description: 리뷰 작성 성공
+ *       400:
+ *         description: 요청 실패 (입력값 검증 실패)
+ *       404:
+ *         description: 공고를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.post('/:id/reviews', authenticate, jobController.createReview);
+
+
 module.exports = router;
