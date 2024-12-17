@@ -20,7 +20,6 @@ const JobSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
       trim: true,
     },
     experience: {
@@ -35,7 +34,6 @@ const JobSchema = new mongoose.Schema(
     },
     employment_type: {
       type: String,
-      required: true,
       trim: true,
     },
     job_tag: {
@@ -49,7 +47,6 @@ const JobSchema = new mongoose.Schema(
     },
     deadline: {
       type: Date, // 마감일
-      required: true,
     },
     created_at: {
       type: Date,

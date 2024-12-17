@@ -13,6 +13,8 @@ exports.authenticate = (req, res, next) => {
     const decoded = jwt.verify(token, 'your_secret_key'); // JWT 비밀키는 환경 변수로 관리하는 것이 좋습니다.
     console.log('Decoded Token:', decoded);
     req.user = decoded; // 사용자 정보를 req.user에 저장
+    console.log('Authenticated User:', req.user);
+
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });

@@ -63,7 +63,7 @@ exports.login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       'your_secret_key',
-      { expiresIn: '15m' } // Access 토큰은 15분 유효
+      { expiresIn: '24h' } // Access 토큰은 15분 유효
     );
 
     // Refresh 토큰 발급
@@ -99,7 +99,7 @@ exports.refreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       'your_secret_key',
-      { expiresIn: '15m' } // Access 토큰은 15분 유효
+      { expiresIn: '24h' } // Access 토큰은 15분 유효
     );
 
     const newRefreshToken = crypto.randomBytes(64).toString('hex');

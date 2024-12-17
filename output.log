@@ -2,26 +2,14 @@ Swagger 문서: http://113.198.66.75:18027/api-docs
 MongoDB 연결 성공
 Server is running at http://113.198.66.75:80
 Decoded Token: {
-  userId: '676164a7cfd1907d2d9acbe8',
-  email: 'testuser@example.com',
-  iat: 1734436335,
-  exp: 1734437235
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
 }
-Decoded Token: {
-  userId: '676164a7cfd1907d2d9acbe8',
-  email: 'testuser@example.com',
-  iat: 1734436335,
-  exp: 1734437235
-}
-Decoded Token: {
-  userId: '676164a7cfd1907d2d9acbe8',
-  email: 'testuser@example.com',
-  iat: 1734436335,
-  exp: 1734437235
-}
-Decoded Token: {
-  userId: '676164a7cfd1907d2d9acbe8',
-  email: 'testuser@example.com',
-  iat: 1734436335,
-  exp: 1734437235
+Authenticated User: {
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
 }
