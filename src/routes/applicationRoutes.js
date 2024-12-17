@@ -40,7 +40,7 @@ router.post('/', authenticate, applicationController.applyJob);
  * /applications:
  *   get:
  *     summary: 지원 내역 조회
- *     description: 사용자별 지원 내역을 조회합니다.
+ *     description: 인증된 사용자의 지원 내역을 조회합니다.
  *     tags:
  *       - Applications
  *     parameters:
@@ -53,10 +53,32 @@ router.post('/', authenticate, applicationController.applyJob);
  *         name: sort
  *         schema:
  *           type: string
+ *           enum: [appliedAt, updatedAt]
+ *           default: appliedAt
  *         description: 정렬 기준 (appliedAt, updatedAt)
  *     responses:
  *       200:
  *         description: 지원 내역 조회 성공
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: 지원 내역 조회 성공
+ *               data:
+ *                 - _id: "6761f90b35d4cd19b8471234"
+ *                   status: "지원중"
+ *                   appliedAt: "2024-06-17T10:15:30.123Z"
+ *                   updatedAt: "2024-06-17T10:15:30.123Z"
+ *                   job:
+ *                     _id: "67619746f603cd8d28451fa3"
+ *                     title: "프론트엔드 개발자"
+ *                     deadline: "2024-07-01"
+ *                     company:
+ *                       company_name: "ABC Tech"
+ *       400:
+ *         description: 잘못된 요청 (쿼리 파라미터 오류)
+ *       500:
+ *         description: 서버 에러
  */
 router.get('/', authenticate, applicationController.getApplications);
 

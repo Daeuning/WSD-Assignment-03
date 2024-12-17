@@ -51,17 +51,23 @@ exports.applyJob = async (req, res) => {
 // 지원 내역 조회
 exports.getApplications = async (req, res) => {
   try {
-    const { status, sort = 'appliedAt' } = req.query;
-    const userId = req.user.id; // 인증된 사용자 ID
+    const { status, sort = 'appliedAt' } = req.query; // 상태 필터링 및 정렬 기준
+    const userId = req.user.userId; // 인증된 사용자 ID
 
+    // 필터링 조건 설정
     const query = { user: userId };
     if (status) {
-      query['status'] = status; // 상태 필터링
+      query['status'] = status; // 상태가 제공된 경우 필터링
     }
 
+    // 지원 내역 조회
     const applications = await Application.find(query)
-      .populate('job', 'title company deadline') // 공고 정보 추가
-      .sort({ [sort]: -1 }); // 날짜 정렬
+      .populate({
+        path: 'job',
+        select: 'title company deadline', // 공고의 타이틀, 회사 정보, 마감일만 가져오기
+        populate: { path: 'company', select: 'company_name' }, // 회사 이름 가져오기
+      })
+      .sort({ [sort]: -1 }); // 날짜 정렬 (default: appliedAt 내림차순)
 
     successResponse(res, applications, '지원 내역 조회 성공');
   } catch (error) {
