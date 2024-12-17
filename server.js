@@ -7,11 +7,12 @@ const jobRoutes = require('./src/routes/jobRoutes')
 const applicationRoutes = require('./src/routes/applicationRoutes');
 const swaggerSpec = require('./src/config/swagger'); 
 const swaggerUi = require('swagger-ui-express');
+require('dotenv').config(); // dotenv 설정
 
 const app = express();
 
 // MongoDB 연결
-const url = 'mongodb+srv://daeun3736:9Uj4KHXKb62ckm9c@cluster0.hjsty.mongodb.net/wsd3?retryWrites=true&w=majority';
+const url = process.env.MONGO_URI;
 
 mongoose
   .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
