@@ -64,7 +64,7 @@ def crawl_saramin(keyword, pages=1):
                     job_sector = job.select_one('.job_sector')
                     sector = job_sector.text.strip() if job_sector else ''
 
-                    # 평균연봉 정보 (있는 경우)
+                    # 태그
                     badge = job.select_one('.area_badge .badge')
                     job_badge = badge.text.strip() if badge else ''
 
