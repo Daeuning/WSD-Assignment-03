@@ -79,8 +79,8 @@ exports.getApplications = async (req, res) => {
 // 지원 취소
 exports.cancelApplication = async (req, res) => {
   try {
-    const { id } = req.params;
-    const userId = req.user.id;
+    const { id } = req.params; // 지원 ID
+    const userId = req.user.userId; // 인증된 사용자 ID
 
     // 지원 내역 존재 확인
     const application = await Application.findOne({ _id: id, user: userId });
@@ -88,19 +88,34 @@ exports.cancelApplication = async (req, res) => {
       return errorResponse(res, null, '해당 지원 내역을 찾을 수 없습니다.');
     }
 
-    // 취소 가능 여부 확인
-    if (application.status !== '지원중') {
-      return errorResponse(res, null, '이미 처리된 지원은 취소할 수 없습니다.');
+    // 취소 불가능 상태 확인
+    const notCancellableStates = ['취소됨', '합격', '불합격'];
+    if (notCancellableStates.includes(application.status)) {
+      return errorResponse(res, null, `이미 '${application.status}' 상태인 지원은 취소할 수 없습니다.`);
     }
 
-    // 상태 업데이트
-    application.status = '취소됨';
-    application.updatedAt = Date.now();
-    await application.save();
+    // 취소 가능 상태 확인
+    if (application.status === '지원중') {
+      // 상태 업데이트
+      application.status = '취소됨';
+      application.updatedAt = Date.now();
+      await application.save();
 
-    successResponse(res, application, '지원이 취소되었습니다.');
+      // JobStatistics에서 applications 값 감소
+      await JobStatistics.findOneAndUpdate(
+        { job_id: application.job },
+        { $inc: { applications: -1 } }, // applications 필드 1 감소
+        { new: true }
+      );
+
+      return successResponse(res, application, '지원이 취소되었습니다.');
+    }
+
+    // 기타 예상치 못한 상태 처리
+    return errorResponse(res, null, '지원 상태를 확인할 수 없습니다.');
   } catch (error) {
     console.error('지원 취소 에러:', error);
     errorResponse(res, error.message, '지원 취소 실패');
   }
 };
+

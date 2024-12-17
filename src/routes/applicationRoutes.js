@@ -87,7 +87,7 @@ router.get('/', authenticate, applicationController.getApplications);
  * /applications/{id}:
  *   delete:
  *     summary: 지원 취소
- *     description: 특정 지원 내역을 취소합니다.
+ *     description: 특정 지원 내역을 취소합니다. 상태가 '지원중'일 때만 취소 가능합니다.
  *     tags:
  *       - Applications
  *     parameters:
@@ -100,6 +100,22 @@ router.get('/', authenticate, applicationController.getApplications);
  *     responses:
  *       200:
  *         description: 지원이 취소되었습니다.
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: 지원이 취소되었습니다.
+ *               data:
+ *                 _id: "6761f90b35d4cd19b8471234"
+ *                 status: "취소됨"
+ *                 appliedAt: "2024-06-17T10:15:30.123Z"
+ *                 updatedAt: "2024-06-18T12:00:00.000Z"
+ *       400:
+ *         description: 이미 처리된 지원은 취소할 수 없습니다.
+ *       404:
+ *         description: 해당 지원 내역을 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 오류
  */
 router.delete('/:id', authenticate, applicationController.cancelApplication);
 
