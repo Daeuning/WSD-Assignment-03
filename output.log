@@ -1,3 +1,52 @@
 Swagger 문서: http://113.198.66.75:18027/api-docs
 MongoDB 연결 성공
 Server is running at http://113.198.66.75:80
+Decoded Token: {
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
+}
+Authenticated User: {
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
+}
+공고 및 회사 등록 에러: MongoServerError: E11000 duplicate key error collection: wsd3.jobs index: title_1_company_1 dup key: { title: "프론트엔드 개발자", company: ObjectId('6761aff9f1b1706c602bcb3a') }
+    at InsertOneOperation.execute (/home/ubuntu/WSD-Assignment-03/node_modules/mongoose/node_modules/mongodb/lib/operations/insert.js:51:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async tryOperation (/home/ubuntu/WSD-Assignment-03/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:203:20)
+    at async executeOperation (/home/ubuntu/WSD-Assignment-03/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:73:16)
+    at async Collection.insertOne (/home/ubuntu/WSD-Assignment-03/node_modules/mongoose/node_modules/mongodb/lib/collection.js:157:16) {
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: `E11000 duplicate key error collection: wsd3.jobs index: title_1_company_1 dup key: { title: "프론트엔드 개발자", company: ObjectId('6761aff9f1b1706c602bcb3a') }`,
+    keyPattern: { title: 1, company: 1 },
+    keyValue: {
+      title: '프론트엔드 개발자',
+      company: new ObjectId('6761aff9f1b1706c602bcb3a')
+    }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { title: 1, company: 1 },
+  keyValue: {
+    title: '프론트엔드 개발자',
+    company: new ObjectId('6761aff9f1b1706c602bcb3a')
+  },
+  [Symbol(errorLabels)]: Set(0) {}
+}
+Decoded Token: {
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
+}
+Authenticated User: {
+  userId: '67616742cfd1907d2d9acbf3',
+  email: 'catcat@example.com',
+  iat: 1734452447,
+  exp: 1734538847
+}

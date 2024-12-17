@@ -179,44 +179,66 @@ exports.createJob = async (req, res) => {
   try {
     const {
       title,
-      company_id,
+      company_name, // 회사명
+      industry, // 업종
+      website, // 회사 홈페이지
+      address, // 회사 주소
+      ceo_name, // 대표자명
+      business_description, // 사업 내용
       experience,
       education,
       employment_type,
       salary,
       stack_tags,
       deadline,
+      link, // 채용 공고 링크
     } = req.body;
 
-    // 필수 입력 값 확인
-    if (!title || !company_id || !experience || !employment_type || !salary || !stack_tags || !deadline) {
-      return errorResponse(res, null, '모든 필드를 입력해주세요.');
+    // 필수 입력 값 검증
+    if (!title || !company_name || !experience || !employment_type || !salary || !stack_tags || !deadline || !link) {
+      return errorResponse(res, null, '모든 필수 필드를 입력해주세요.');
     }
 
-    // 회사 존재 여부 확인
-    const company = await Company.findById(company_id);
+    // 1. 회사 정보 확인 및 저장 (중복 체크)
+    let company = await Company.findOne({ company_name });
+
     if (!company) {
-      return errorResponse(res, null, '존재하지 않는 회사 ID입니다.');
+      company = new Company({
+        company_name,
+        industry: industry || '',
+        website: website || '',
+        address: address || '',
+        ceo_name: ceo_name || '',
+        business_description: business_description || '',
+      });
+      await company.save();
     }
 
-    // 새로운 Job 생성
+    // 2. 마감일 검증
+    const parsedDeadline = new Date(deadline);
+    if (isNaN(parsedDeadline.getTime()) || parsedDeadline < new Date()) {
+      return errorResponse(res, null, '유효한 마감일을 입력해주세요. 마감일은 현재 날짜 이후여야 합니다.');
+    }
+
+    // 3. 채용 공고 생성
     const job = new Job({
       title,
-      company: company_id,
+      company: company._id, // 생성된 회사 ID 연결
       experience,
-      education,
+      education: education || '',
       employment_type,
       salary,
       stack_tags: stack_tags.split(',').map(tag => tag.trim()),
-      deadline,
+      deadline: parsedDeadline,
+      link, // 링크 추가
     });
 
     await job.save();
 
-    successResponse(res, job, '채용 공고가 성공적으로 등록되었습니다.');
+    successResponse(res, { job, company}, '채용 공고와 회사 정보가 성공적으로 등록되었습니다.');
   } catch (error) {
-    console.error('공고 등록 에러:', error);
-    errorResponse(res, error.message, '공고 등록 실패');
+    console.error('공고 및 회사 등록 에러:', error);
+    errorResponse(res, error.message, '공고 및 회사 등록 실패');
   }
 };
 
@@ -262,6 +284,7 @@ exports.updateJob = async (req, res) => {
     errorResponse(res, error.message, '공고 수정 실패');
   }
 };
+
 
 exports.deleteJob = async (req, res) => {
   try {
