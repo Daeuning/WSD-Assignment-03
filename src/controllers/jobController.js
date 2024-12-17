@@ -2,34 +2,63 @@ const Job = require('../models/Job');
 const Company = require('../models/Company');
 const { successResponse, errorResponse } = require('../views/jobView');
 
-// 공고 목록 조회 (필터링 + 페이지네이션 + 정렬)
+// 공고 목록 조회 (필터링 + 페이지네이션 + 정렬 + 검색)
 exports.getJobs = async (req, res) => {
   try {
     // Query 파라미터 받기
-    const { page = 1, location, experience, salary, stack_tags, sortBy = 'created_at', order = 'desc' } = req.query;
+    const {
+      page = 1,
+      location,
+      experience,
+      salary,
+      stack_tags,
+      sortBy = 'created_at',
+      order = 'desc',
+      company_name, // 회사명 검색
+      title,        // 포지션 검색
+      keyword,      // 키워드 검색
+    } = req.query;
 
     // 페이지네이션 설정
-    const currentPage = Math.max(1, parseInt(page)); // 최소값 1 보장
-    const limit = 20; // 페이지 크기 고정
+    const currentPage = Math.max(1, parseInt(page));
+    const limit = 20;
     const skip = (currentPage - 1) * limit;
 
     // 필터링 조건 설정
     const filters = {};
-    if (location) filters.location = { $regex: location, $options: 'i' }; // 부분 일치, 대소문자 무시
-    if (experience) filters.experience = { $regex: experience, $options: 'i' }; // 부분 일치, 대소문자 무시
+    if (location) filters.location = { $regex: location, $options: 'i' };
+    if (experience) filters.experience = { $regex: experience, $options: 'i' };
     if (salary) {
       const [minSalary, maxSalary] = salary.split('-');
       filters.salary = { $gte: parseInt(minSalary), $lte: parseInt(maxSalary) };
     }
     if (stack_tags) {
-      filters.stack_tags = { $in: stack_tags.split(',').map(tag => tag.trim()) }; // 일부 태그 일치
+      filters.stack_tags = { $in: stack_tags.split(',').map(tag => tag.trim()) };
+    }
+
+    // 검색 조건 추가
+    if (company_name) {
+      const companies = await Company.find({
+        company_name: { $regex: company_name, $options: 'i' },
+      }).select('_id'); // Company _id만 가져옴
+      filters.company = { $in: companies.map(c => c._id) };
+    }
+
+    if (title) {
+      filters.title = { $regex: title, $options: 'i' };
+    }
+
+    if (keyword) {
+      filters.$or = [
+        { title: { $regex: keyword, $options: 'i' } },
+        { job_tag: { $regex: keyword, $options: 'i' } },
+        { stack_tags: { $in: [new RegExp(keyword, 'i')] } },
+      ];
     }
 
     // 정렬 조건 설정
-    const validSortFields = ['created_at', 'deadline']; // 허용된 정렬 필드
+    const validSortFields = ['created_at', 'deadline'];
     const sortOptions = {};
-
-    // 유효한 필드만 정렬에 사용
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
     sortOptions[sortField] = order === 'desc' ? -1 : 1;
 
@@ -39,9 +68,10 @@ exports.getJobs = async (req, res) => {
 
     // 필터링 및 페이지네이션된 데이터 가져오기 + 정렬
     const jobs = await Job.find(filters)
-      .sort(sortOptions)  // 정렬 적용
-      .skip(skip)         // 건너뛰기
-      .limit(limit);      // 페이지 크기
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .populate('company', 'company_name'); // 회사 정보 포함
 
     // 응답 반환
     res.status(200).json({
@@ -67,6 +97,7 @@ exports.getJobs = async (req, res) => {
     });
   }
 };
+
 
 
 exports.getJobById = async (req, res) => {
