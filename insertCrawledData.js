@@ -27,12 +27,27 @@ const cleanText = (text) => {
 
 // "등록일"을 날짜로 변환하는 함수
 const parseDate = (text) => {
+  if (!text) return null; // text가 비어있으면 null 반환
+  
   const cleanedText = text.replace(/등록일\s?/g, '').trim(); // '등록일' 제거
   const dateParts = cleanedText.split('/'); // '24/12/16' 형태를 분리
+  
   if (dateParts.length === 3) {
-    return new Date(`20${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // ISO Date 형식
+    const date = new Date(`20${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`);
+    return isNaN(date.getTime()) ? null : date; // 유효하지 않은 날짜 확인
   }
-  return new Date(); // 오류 시 현재 날짜 반환
+  
+  return null; // 유효하지 않은 포맷인 경우
+};
+
+// "마감일"을 날짜로 변환하는 함수
+const parseDeadline = (text) => {
+  if (!text || text.includes('채용시')) return null; // "채용시" 또는 빈 값은 null 반환
+  
+  const cleanedText = text.replace('~ ', '2024-').trim(); // "~ " 제거하고 연도 붙이기
+  const date = new Date(cleanedText);
+  
+  return isNaN(date.getTime()) ? null : date; // 유효하지 않은 날짜는 null 반환
 };
 
 // 데이터 삽입 함수
@@ -79,9 +94,9 @@ const insertCrawledData = async () => {
                 .split(',')
                 .map((tag) => tag.trim())
                 .filter((tag) => tag), // 태그 정제
-          deadline: new Date(item['마감일'].replace('~ ', '2024-')),
-          created_at: parseDate(item['등록일']),
-        };
+          deadline: parseDeadline(item['마감일']), // 날짜 검증 후 설정
+          created_at: parseDate(item['등록일']) || new Date(), // 날짜가 유효하지 않으면 현재 날짜
+        };    
 
         const existingJob = await Job.findOne({ title: jobData.title, company: company._id });
         if (!existingJob) {

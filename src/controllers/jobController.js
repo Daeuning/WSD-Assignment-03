@@ -2,55 +2,60 @@ const Job = require('../models/Job');
 const Company = require('../models/Company');
 const { successResponse, errorResponse } = require('../views/jobView');
 
-
 // 공고 목록 조회 (페이지네이션, 필터링, 정렬)
+// 공고 목록 조회 (필터링 + 페이지네이션)
 exports.getJobs = async (req, res) => {
   try {
     // Query 파라미터 받기
-    const { page = 1, pageSize = 20, sort = 'created_at', location, experience, salary, stack_tags } = req.query;
+    const { page = 1, location, experience, salary, stack_tags } = req.query;
 
-    // 필터링 조건 만들기
+    // 페이지네이션 설정
+    const currentPage = Math.max(1, parseInt(page)); // 최소값 1 보장
+    const limit = 20; // 페이지 크기 고정
+    const skip = (currentPage - 1) * limit;
+
+    // 필터링 조건 설정
     const filters = {};
-    if (location) filters.location = location;
-    if (experience) filters.experience = experience;
+    if (location) filters.location = { $regex: location, $options: 'i' }; // 부분 일치, 대소문자 무시
+    if (experience) filters.experience = { $regex: experience, $options: 'i' }; // 부분 일치, 대소문자 무시
     if (salary) {
       const [minSalary, maxSalary] = salary.split('-');
       filters.salary = { $gte: parseInt(minSalary), $lte: parseInt(maxSalary) };
     }
     if (stack_tags) {
-      filters.stack_tags = { $all: stack_tags.split(',') }; // 스택 태그를 배열로 필터링
+      filters.stack_tags = { $in: stack_tags.split(',').map(tag => tag.trim()) }; // 일부 태그 일치
     }
 
-    // 페이지네이션 처리
-    const currentPage = parseInt(page);
-    const limit = parseInt(pageSize);
-    const skip = (currentPage - 1) * limit;
-
-    // 데이터 가져오기
-    const jobs = await Job.find(filters)
-      .sort({ [sort]: 1 }) // 정렬
-      .skip(skip)          // 페이지 건너뛰기
-      .limit(limit);       // 한 페이지당 데이터 개수 제한
-
-    // 전체 데이터 수 구하기
+    // 전체 데이터 수 계산
     const totalItems = await Job.countDocuments(filters);
     const totalPages = Math.ceil(totalItems / limit);
 
-    // 응답 데이터
+    // 필터링 및 페이지네이션된 데이터 가져오기
+    const jobs = await Job.find(filters)
+      .skip(skip)          // 건너뛰기
+      .limit(limit);       // 페이지 크기
+
+    // 응답 반환
     res.status(200).json({
       status: 'success',
       data: jobs,
       pagination: {
         currentPage,
         totalPages,
-        totalItems
-      }
+        totalItems,
+        pageSize: limit,
+      },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: 'error', message: '공고 목록 조회 실패', error: error.message });
+    console.error('Error fetching job listings:', error);
+    res.status(500).json({
+      status: 'error',
+      message: '공고 목록 조회 실패',
+      error: error.message,
+    });
   }
 };
+
 
 exports.getJobById = async (req, res) => {
   try {

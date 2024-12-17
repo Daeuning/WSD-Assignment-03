@@ -9,25 +9,19 @@ const router = express.Router();
  * /jobs:
  *   get:
  *     summary: 공고 목록 조회
- *     description: 필터링 및 페이지네이션을 통해 공고 목록을 조회합니다.
+ *     description: 필터링 및 페이지네이션을 통해 공고 목록을 조회합니다. 페이지당 데이터 개수는 고정값 20입니다.
  *     tags:
  *       - Jobs
  *     parameters:
  *       - in: query
  *         name: page
- *         description: 페이지 번호
+ *         description: 페이지 번호 (1부터 시작)
  *         schema:
  *           type: integer
  *           default: 1
  *       - in: query
- *         name: pageSize
- *         description: 페이지당 데이터 개수
- *         schema:
- *           type: integer
- *           default: 20
- *       - in: query
  *         name: sort
- *         description: 정렬 기준
+ *         description: 정렬 기준 
  *         schema:
  *           type: string
  *           default: created_at
@@ -43,7 +37,7 @@ const router = express.Router();
  *           type: string
  *       - in: query
  *         name: salary
- *         description: 급여 필터링 (예: 3000-5000)
+ *         description: 급여 필터링 
  *         schema:
  *           type: string
  *       - in: query
@@ -54,7 +48,62 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 공고 목록 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "60f5c4e2d5e44b3b4c8f1c45"
+ *                       title:
+ *                         type: string
+ *                         example: "Node.js 백엔드 개발자 모집"
+ *                       company:
+ *                         type: string
+ *                         example: "ABC Tech"
+ *                       location:
+ *                         type: string
+ *                         example: "서울"
+ *                       experience:
+ *                         type: string
+ *                         example: "3년차"
+ *                       salary:
+ *                         type: integer
+ *                         example: 5000
+ *                       stack_tags:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                         example: ["Node.js", "Express", "MongoDB"]
+ *                       created_at:
+ *                         type: string
+ *                         example: "2024-06-17T10:15:30.123Z"
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       example: 1
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 2
+ *                     totalItems:
+ *                       type: integer
+ *                       example: 34
+ *                     pageSize:
+ *                       type: integer
+ *                       example: 20
  */
+
 router.get('/', jobController.getJobs);
 
 /**
