@@ -111,7 +111,7 @@ router.get('/', authenticate, jobController.getJobs);
  * /jobs/{id}:
  *   get:
  *     summary: 공고 상세 조회
- *     description: 특정 공고의 상세 정보를 조회합니다.
+ *     description: 특정 공고의 상세 정보를 조회하고 조회수 증가 및 관련 공고를 반환합니다.
  *     tags:
  *       - Jobs
  *     parameters:
@@ -124,8 +124,29 @@ router.get('/', authenticate, jobController.getJobs);
  *     responses:
  *       200:
  *         description: 공고 상세 조회 성공
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: 공고 상세 조회 성공
+ *               data:
+ *                 job:
+ *                   _id: "60c72b2f5f1b2c001f4a1a2a"
+ *                   title: "프론트엔드 개발자"
+ *                   company: { company_name: "ABC Tech", industry: "IT", website: "https://abc.com" }
+ *                   views: 120
+ *                   stack_tags: ["React", "Node.js"]
+ *                   created_at: "2024-04-01T12:00:00Z"
+ *                 relatedJobs:
+ *                   - _id: "60c72b3f5f1b2c001f4a1a2b"
+ *                     title: "백엔드 개발자"
+ *                     company: { company_name: "ABC Tech" }
  *       400:
- *         description: 요청 실패
+ *         description: 잘못된 요청 - 공고 ID가 유효하지 않음
+ *       404:
+ *         description: 해당 공고를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
  */
 router.get('/:id', jobController.getJobById);
 

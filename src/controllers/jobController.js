@@ -1,6 +1,7 @@
 const Job = require('../models/Job');
 const Company = require('../models/Company');
 const SearchHistory = require('../models/SearchHistory');
+const JobStatistics = require('../models/JobStatistics');
 const { successResponse, errorResponse } = require('../views/jobView');
 
 // 검색 기록 저장 함수
@@ -136,25 +137,43 @@ exports.getJobById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const job = await Job.findById(id).populate('company');
-    if (!job) return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
+    // 공고 상세 정보 조회
+    const job = await Job.findById(id)
+      .populate('company', 'company_name industry website');
 
-    job.views += 1;
-    await job.save();
+    if (!job) {
+      return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
+    }
 
+    // JobStatistics 모델에서 views 값을 1 증가시킴
+    await JobStatistics.findOneAndUpdate(
+      { job_id: id }, // Job의 ID에 해당하는 통계 찾기
+      { $inc: { views: 1 } }, // views 값 1 증가
+      { upsert: true, new: true } // 없으면 생성 (upsert), 업데이트된 문서 반환
+    );
+
+    // 관련 공고 조회: 같은 회사 또는 스택 태그가 일치하는 공고
     const relatedJobs = await Job.find({
-      _id: { $ne: job._id },
+      _id: { $ne: job._id }, // 현재 공고 제외
       $or: [
-        { company: job.company._id },
-        { stack_tags: { $in: job.stack_tags } }
-      ]
-    }).limit(5);
+        { company: job.company._id }, // 같은 회사의 공고
+        { stack_tags: { $in: job.stack_tags } }, // 기술 스택이 일치하는 공고
+      ],
+    })
+      .limit(5)
+      .sort({ created_at: -1 }); // 최신 공고 우선 정렬
 
-    successResponse(res, { job, relatedJobs }, '공고 상세 조회 성공');
+    successResponse(
+      res,
+      { job, relatedJobs },
+      '공고 상세 조회 성공'
+    );
   } catch (error) {
+    console.error('❌ 공고 상세 조회 실패:', error.message);
     errorResponse(res, error.message, '공고 상세 조회 실패');
   }
 };
+
 
 exports.createJob = async (req, res) => {
   try {
