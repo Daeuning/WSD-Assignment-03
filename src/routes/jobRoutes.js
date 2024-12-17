@@ -8,56 +8,52 @@ const router = express.Router();
  * @swagger
  * /jobs:
  *   get:
- *     summary: 공고 목록 조회 및 정렬
- *     description: 채용 공고를 페이지네이션, 필터링, 정렬, 검색 기능과 함께 조회합니다.
+ *     summary: 공고 목록 조회
+ *     description: 필터링 및 페이지네이션을 통해 공고 목록을 조회합니다.
  *     tags:
  *       - Jobs
  *     parameters:
  *       - in: query
  *         name: page
+ *         description: 페이지 번호
  *         schema:
  *           type: integer
- *         description: 페이지 번호 (기본값 1)
+ *           default: 1
  *       - in: query
- *         name: size
+ *         name: pageSize
+ *         description: 페이지당 데이터 개수
  *         schema:
  *           type: integer
- *         description: 페이지 크기 (기본값 20)
+ *           default: 20
  *       - in: query
  *         name: sort
+ *         description: 정렬 기준
  *         schema:
  *           type: string
- *         description: 정렬 기준 
+ *           default: created_at
  *       - in: query
  *         name: location
+ *         description: 지역 필터링
  *         schema:
  *           type: string
- *         description: 지역별 필터 (부분 일치 검색 가능)
  *       - in: query
  *         name: experience
+ *         description: 경력 필터링
  *         schema:
  *           type: string
- *         description: 경력별 필터
  *       - in: query
  *         name: salary
+ *         description: 급여 필터링 (예: 3000-5000)
  *         schema:
  *           type: string
- *         description: 급여별 필터 (부분 일치)
  *       - in: query
- *         name: stack
+ *         name: stack_tags
+ *         description: 기술 스택 필터링 (쉼표로 구분)
  *         schema:
  *           type: string
- *         description: 기술 스택 필터 (쉼표로 구분된 목록)
- *       - in: query
- *         name: keyword
- *         schema:
- *           type: string
- *         description: 키워드 검색 (공고 제목 기준)
  *     responses:
  *       200:
  *         description: 공고 목록 조회 성공
- *       400:
- *         description: 요청 실패
  */
 router.get('/', jobController.getJobs);
 

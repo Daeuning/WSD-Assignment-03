@@ -18,17 +18,19 @@ mongoose
 const cleanText = (text) => {
   if (!text) return '';
   return text
-    .replace(/수정일\s?\d{2}\/\d{2}\/\d{2}/g, '') // '수정일 24/12/16' 제거
-    .replace(/\n지도보기/g, '') // '\n지도보기' 제거
+    .replace(/등록일\s?\d{2}\/\d{2}\/\d{2}/g, '') // '등록일 24/12/16' 제거
+    .replace(/외\s*$/g, '') // 끝에 '외' 제거
+    .replace(/스크랩 급상승/g, '') // '스크랩 급상승' 제거
+    .replace(/[\n\r]/g, '') // 줄바꿈 제거
     .trim(); // 앞뒤 공백 제거
 };
 
 // "등록일"을 날짜로 변환하는 함수
 const parseDate = (text) => {
-  const cleanedText = text.replace(/수정일\s?/g, '').trim(); // '수정일' 제거
+  const cleanedText = text.replace(/등록일\s?/g, '').trim(); // '등록일' 제거
   const dateParts = cleanedText.split('/'); // '24/12/16' 형태를 분리
   if (dateParts.length === 3) {
-    return new Date(`20${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // '20' 붙여서 ISO Date 형식
+    return new Date(`20${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`); // ISO Date 형식
   }
   return new Date(); // 오류 시 현재 날짜 반환
 };
@@ -48,14 +50,12 @@ const insertCrawledData = async () => {
           company_name: item['회사명'],
           industry: cleanText(item['업종']),
           website: item['홈페이지'],
-          address: cleanText(item['주소']), // 지도보기 제거
+          address: cleanText(item['주소']),
           ceo_name: item['대표자명'],
           business_description: cleanText(item['사업내용']),
         };
 
-        // 기존 회사 존재 여부 확인
         let company = await Company.findOne({ company_name: companyData.company_name });
-
         if (!company) {
           company = await Company.create(companyData);
           console.log(`✅ 회사 저장: ${company.company_name}`);
@@ -65,27 +65,25 @@ const insertCrawledData = async () => {
 
         // 2. 채용공고 정보 정제 및 저장
         const jobData = {
-          title: item['제목'],
-          company: company._id, // 회사 ID 참조
+          title: cleanText(item['제목']),
+          company: company._id,
           link: item['링크'],
           location: cleanText(item['지역']),
           experience: cleanText(item['경력']),
           education: cleanText(item['학력']),
           employment_type: cleanText(item['고용형태']),
           job_tag: cleanText(item['태그']),
-          stack_tags: cleanText(item['직무분야'])
-            ? cleanText(item['직무분야'])
+          stack_tags: Array.isArray(item['직무분야'])
+            ? item['직무분야'].map(tag => cleanText(tag))
+            : cleanText(item['직무분야'])
                 .split(',')
                 .map((tag) => tag.trim())
-                .filter((tag) => tag) // 직무 분야 정제
-            : [],
-          deadline: new Date(item['마감일'].replace('~ ', '2024-')), // 마감일 처리
-          created_at: parseDate(item['등록일']), // 등록일을 날짜로 변환
+                .filter((tag) => tag), // 태그 정제
+          deadline: new Date(item['마감일'].replace('~ ', '2024-')),
+          created_at: parseDate(item['등록일']),
         };
 
-        // 중복된 채용 공고 확인 (제목과 회사 ID 기준)
         const existingJob = await Job.findOne({ title: jobData.title, company: company._id });
-
         if (!existingJob) {
           await Job.create(jobData);
           console.log(`✅ 채용 공고 저장: ${jobData.title}`);
