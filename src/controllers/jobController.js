@@ -26,8 +26,12 @@ exports.getJobs = async (req, res) => {
     }
 
     // 정렬 조건 설정
+    const validSortFields = ['created_at', 'deadline']; // 허용된 정렬 필드
     const sortOptions = {};
-    sortOptions[sortBy] = order === 'desc' ? -1 : 1;
+
+    // 유효한 필드만 정렬에 사용
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+    sortOptions[sortField] = order === 'desc' ? -1 : 1;
 
     // 전체 데이터 수 계산
     const totalItems = await Job.countDocuments(filters);
