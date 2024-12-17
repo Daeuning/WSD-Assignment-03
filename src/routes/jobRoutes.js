@@ -240,7 +240,7 @@ router.put('/:id', authenticate, jobController.updateJob);
  * /jobs/{id}:
  *   delete:
  *     summary: 공고 삭제
- *     description: 기존 채용 공고를 삭제합니다.
+ *     description: 기존 채용 공고와 연관된 통계를 삭제합니다.
  *     tags:
  *       - Jobs
  *     parameters:
@@ -253,7 +253,12 @@ router.put('/:id', authenticate, jobController.updateJob);
  *     responses:
  *       200:
  *         description: 공고 삭제 성공
+ *       400:
+ *         description: 유효하지 않은 공고 ID
+ *       404:
+ *         description: 삭제할 공고를 찾을 수 없음
  */
+
 router.delete('/:id', authenticate, jobController.deleteJob);
 
 module.exports = router;

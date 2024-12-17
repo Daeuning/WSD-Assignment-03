@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const Company = require('../models/Company');
 const SearchHistory = require('../models/SearchHistory');
@@ -310,14 +311,24 @@ exports.updateJob = async (req, res) => {
 };
 
 
+// 공고 삭제
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // 요청된 ID의 유효성 확인
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return errorResponse(res, null, '유효하지 않은 공고 ID입니다.');
+    }
+
+    // 공고 삭제
     const job = await Job.findByIdAndDelete(id);
     if (!job) {
       return errorResponse(res, null, '해당 공고를 찾을 수 없습니다.');
     }
+
+    // 관련 JobStatistics 삭제
+    await JobStatistics.deleteOne({ job_id: id });
 
     successResponse(res, null, '공고가 성공적으로 삭제되었습니다.');
   } catch (error) {
