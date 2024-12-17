@@ -104,7 +104,7 @@ const router = express.Router();
  *                       example: 20
  */
 
-router.get('/', jobController.getJobs);
+router.get('/', authenticate, jobController.getJobs);
 
 /**
  * @swagger

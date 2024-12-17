@@ -1,6 +1,35 @@
 const Job = require('../models/Job');
 const Company = require('../models/Company');
+const SearchHistory = require('../models/SearchHistory');
 const { successResponse, errorResponse } = require('../views/jobView');
+
+// 검색 기록 저장 함수
+const saveSearchHistory = async (userId, keyword) => {
+  try {
+    if (!userId) return; // userId가 없는 경우 기록하지 않음
+
+    // 검색어가 이미 존재하는지 확인
+    const existingHistory = await SearchHistory.findOne({
+      user_id: userId,
+      search_keyword: keyword,
+    });
+
+    if (existingHistory) {
+      // 이미 존재하면 검색 횟수 증가
+      existingHistory.search_count += 1;
+      existingHistory.updated_at = new Date(); // 검색 시간 업데이트
+      await existingHistory.save();
+    } else {
+      // 존재하지 않으면 새 검색 기록 저장
+      await SearchHistory.create({
+        user_id: userId,
+        search_keyword: keyword,
+      });
+    }
+  } catch (error) {
+    console.error('❌ 검색 기록 저장 실패:', error.message);
+  }
+};
 
 // 공고 목록 조회 (필터링 + 페이지네이션 + 정렬 + 검색)
 exports.getJobs = async (req, res) => {
@@ -54,6 +83,10 @@ exports.getJobs = async (req, res) => {
         { job_tag: { $regex: keyword, $options: 'i' } },
         { stack_tags: { $in: [new RegExp(keyword, 'i')] } },
       ];
+
+      if (req.user && req.user.userId) {
+        await saveSearchHistory(req.user.userId, keyword);
+      }    
     }
 
     // 정렬 조건 설정
@@ -97,7 +130,6 @@ exports.getJobs = async (req, res) => {
     });
   }
 };
-
 
 
 exports.getJobById = async (req, res) => {
