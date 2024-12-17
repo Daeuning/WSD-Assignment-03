@@ -101,40 +101,6 @@ router.post('/refresh', validateInput(refreshTokenValidationRules), userControll
  * /auth/profile:
  *   put:
  *     summary: 회원 정보 수정
- *     description: 사용자 인증 후 이메일 또는 비밀번호를 수정합니다.
- *     tags:
- *       - Auth
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: 새 이메일
- *               password:
- *                 type: string
- *                 description: 현재 비밀번호
- *               newPassword:
- *                 type: string
- *                 description: 새 비밀번호
- *     responses:
- *       200:
- *         description: 회원 정보 수정 성공.
- *       401:
- *         description: 인증 실패.
- */
-router.put('/profile', authenticate, userController.updateProfile);
-
-/**
- * @swagger
- * /auth/profile:
- *   put:
- *     summary: 회원 정보 수정
  *     description: 사용자 인증 후 이메일, 비밀번호 또는 자기소개(bio)를 수정합니다.
  *     tags:
  *       - Auth
@@ -162,6 +128,24 @@ router.put('/profile', authenticate, userController.updateProfile);
  *     responses:
  *       200:
  *         description: 회원 정보 수정 성공.
+ *       401:
+ *         description: 인증 실패.
+ */
+router.put('/profile', authenticate, userController.updateProfile);
+
+/**
+ * @swagger
+ * /auth/user-info:
+ *   get:
+ *     summary: 회원 정보 조회
+ *     description: 사용자 인증 후 회원 정보를 조회합니다.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 회원 정보 조회 성공.
  *       401:
  *         description: 인증 실패.
  */
