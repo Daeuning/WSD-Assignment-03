@@ -1,17 +1,72 @@
 const mongoose = require('mongoose');
 
-const jobSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  experience: { type: String, required: true },
-  education: { type: String, required: true },
-  employment_type: { type: String, required: true },
-  salary: { type: String, required: true },
-  stack_tags: { type: [String], required: true },
-  deadline: { type: String, required: true },
-  created_at: { type: Date, default: Date.now },
-  views: { type: Number, default: 0 },
-  applications: { type: Number, default: 0 },
-}, { collection: 'job' }); // 컬렉션명을 'job'으로 명시
+// Job Schema 정의
+const JobSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true, // 필수 필드
+      trim: true,
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company', // Company 테이블과 연결
+      required: true,
+    },
+    link: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    experience: {
+      type: String,
+      default: 'Not specified',
+      trim: true,
+    },
+    education: {
+      type: String,
+      default: 'Not specified',
+      trim: true,
+    },
+    employment_type: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    job_tag: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    stack_tags: {
+      type: [String], // 기술 스택 태그 배열
+      default: [],
+    },
+    deadline: {
+      type: Date, // 마감일
+      required: true,
+    },
+    created_at: {
+      type: Date,
+      default: Date.now, // 현재 시간
+    },
+    statistics: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Statistics', // 통계 테이블과 연결 (옵션)
+    },
+  },
+  { timestamps: true } // 생성 및 수정 시간 자동 추가
+);
 
-module.exports = mongoose.model('Job', jobSchema);
+// 중복 방지: 제목과 회사가 동일한 경우 중복되지 않도록 설정
+JobSchema.index({ title: 1, company: 1 }, { unique: true });
+
+// Job 모델 생성
+const Job = mongoose.model('Job', JobSchema);
+
+module.exports = Job;
