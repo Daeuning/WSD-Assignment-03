@@ -14,11 +14,11 @@ const app = express();
 const url = process.env.MONGO_URI;
 
 mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(url)
   .then(() => {
     console.log('MongoDB 연결 성공');
     // 서버 시작
-    const PORT = 19027; // SSH 서버에서 사용할 포트
+    const PORT = 80; // 포트를 18027로 변경
     const HOST = '0.0.0.0'; // 외부 접근 허용
     app.listen(PORT, HOST, () => {
       console.log(`Server is running at http://113.198.66.75:${PORT}`);
@@ -38,4 +38,4 @@ app.use('/auth', userRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Swagger UI 경로
 
-console.log('Swagger 문서: http://113.198.66.75:19027/api-docs');
+console.log('Swagger 문서: http://113.198.66.75:18027/api-docs');

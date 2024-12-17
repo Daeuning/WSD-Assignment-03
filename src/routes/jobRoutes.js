@@ -27,7 +27,7 @@ const router = express.Router();
  *         name: sort
  *         schema:
  *           type: string
- *         description: 정렬 기준 (예: views, created_at 등)
+ *         description: 정렬 기준 
  *       - in: query
  *         name: location
  *         schema:
