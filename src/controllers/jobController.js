@@ -331,6 +331,9 @@ exports.deleteJob = async (req, res) => {
     // 관련 JobStatistics 삭제
     await JobStatistics.deleteOne({ job_id: id });
 
+    // 관련 리뷰 삭제
+    await JobReview.deleteMany({ job_id: id });
+
     successResponse(res, null, '공고가 성공적으로 삭제되었습니다.');
   } catch (error) {
     console.error('공고 삭제 에러:', error);
