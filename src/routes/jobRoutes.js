@@ -301,5 +301,40 @@ router.delete('/:id', authenticate, jobController.deleteJob);
  */
 router.post('/:id/reviews', authenticate, jobController.createReview);
 
+/**
+ * @swagger
+ * /jobs/{id}/reviews:
+ *   get:
+ *     summary: 특정 공고의 리뷰 조회
+ *     description: 특정 채용 공고에 대한 리뷰를 조회합니다.
+ *     tags:
+ *       - Jobs
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 공고 ID
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: 페이지 번호
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: 페이지당 리뷰 개수
+ *     responses:
+ *       200:
+ *         description: 리뷰 조회 성공
+ *       400:
+ *         description: 요청 실패
+ *       500:
+ *         description: 서버 에러
+ */
+router.get('/:id/reviews', jobController.getJobReviews);
+
 
 module.exports = router;

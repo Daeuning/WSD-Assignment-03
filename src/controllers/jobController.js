@@ -379,3 +379,30 @@ exports.createReview = async (req, res) => {
     errorResponse(res, error.message, '리뷰 작성 실패');
   }
 };
+
+// 특정 공고의 리뷰 조회
+exports.getJobReviews = async (req, res) => {
+  try {
+    const { id } = req.params; // 공고 ID 가져오기
+    const { page = 1, limit = 10 } = req.query; // 페이지네이션 설정
+
+    // 리뷰 조회
+    const reviews = await JobReview.find({ job_id: id })
+      .populate('user_id', 'email') // 사용자 정보 추가 (email만 반환)
+      .sort({ reviewed_at: -1 }) // 작성일 기준 내림차순
+      .skip((page - 1) * limit) // 페이지네이션 적용
+      .limit(parseInt(limit));
+
+    // 리뷰 개수 가져오기
+    const totalReviews = await JobReview.countDocuments({ job_id: id });
+
+    if (!reviews || reviews.length === 0) {
+      return successResponse(res, { reviews: [], total: 0 }, '리뷰가 존재하지 않습니다.');
+    }
+
+    successResponse(res, { reviews, total: totalReviews }, '리뷰 조회 성공');
+  } catch (error) {
+    console.error('리뷰 조회 에러:', error);
+    errorResponse(res, error.message, '리뷰 조회 실패');
+  }
+};
