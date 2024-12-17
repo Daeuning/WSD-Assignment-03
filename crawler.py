@@ -73,6 +73,21 @@ def crawl_saramin(keyword, pages=1):
                     job_badge = badge.text.strip() if badge else ''
                     print(f"태그: {job_badge}")
 
+                    # 마감일
+                    deadline = job.select_one('.job_date .date')
+                    deadline_text = deadline.text.strip() if deadline else '마감일 미기재'
+                    print(f"마감일: {deadline_text}")
+
+                    # 등록일 (job_day 클래스)
+                    registration = job.select_one('.job_day')
+                    registration_text = registration.text.strip().replace("등록일 ", "") if registration else '등록일 미기재'
+                    print(f"등록일: {registration_text}")
+
+                    # 직무 분야
+                    job_sector = job.select_one('.job_sector')
+                    sector = job_sector.text.strip() if job_sector else '직무분야 미기재'
+                    print(f"직무분야: {sector}")
+
                     # 기업 상세 정보 가져오기
                     company_info = get_company_details(company_url)
                     print(f"기업 상세 정보: {company_info}")
@@ -85,7 +100,10 @@ def crawl_saramin(keyword, pages=1):
                         '경력': experience,
                         '학력': education,
                         '고용형태': employment_type,
-                        '태그': job_badge,  # 태그 추가
+                        '태그': job_badge,
+                        '마감일': deadline_text,      # 마감일
+                        '등록일': registration_text,  # 등록일
+                        '직무분야': sector,            # 직무분야
                         '업종': company_info.get('업종', 'N/A'),
                         '홈페이지': company_info.get('홈페이지', 'N/A'),
                         '주소': company_info.get('주소', 'N/A'),
