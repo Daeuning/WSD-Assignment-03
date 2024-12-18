@@ -253,7 +253,7 @@ WSD-ASSIGNMENT-03/
 | `GET`    | `/auth/user-info`     | 인증된 사용자 정보 조회         | `Authorization: Bearer`   |
 | `DELETE` | `/auth/delete`        | 회원 탈퇴                      | `Authorization: Bearer`   |
 
----
+<br>
 
 ### **Applications**
 | Method   | Endpoint              | Description                    | Required Headers          |
@@ -262,7 +262,7 @@ WSD-ASSIGNMENT-03/
 | `GET`    | `/applications`       | 지원 내역 조회                 | `Authorization: Bearer`   |
 | `DELETE` | `/applications/{id}`  | 특정 지원 취소                 | `Authorization: Bearer`   |
 
----
+<br>
 
 ### **Jobs**
 | Method   | Endpoint              | Description                    | Required Headers          |
@@ -275,7 +275,7 @@ WSD-ASSIGNMENT-03/
 | `POST`   | `/jobs/{id}/reviews`  | 특정 공고에 리뷰 작성          | `Authorization: Bearer`   |
 | `GET`    | `/jobs/{id}/reviews`  | 특정 공고 리뷰 조회            | None                      |
 
----
+<br>
 
 ### **Bookmarks**
 | Method   | Endpoint              | Description                    | Required Headers          |
@@ -283,21 +283,21 @@ WSD-ASSIGNMENT-03/
 | `POST`   | `/bookmarks/toggle`   | 공고 북마크 토글               | `Authorization: Bearer`   |
 | `GET`    | `/bookmarks`          | 북마크 목록 조회               | `Authorization: Bearer`   |
 
----
+<br>
 
 ### **Favorites**
 | Method   | Endpoint              | Description                    | Required Headers          |
 |----------|-----------------------|--------------------------------|---------------------------|
 | `POST`   | `/favorites/toggle`   | 관심 공고 토글                 | `Authorization: Bearer`   |
 
----
+<br>
 
 ### **Search**
 | Method   | Endpoint              | Description                    | Required Headers          |
 |----------|-----------------------|--------------------------------|---------------------------|
 | `GET`    | `/search/top-keywords`| 상위 3개 검색 키워드 조회      | `Authorization: Bearer`   |
 
----
+
 
 <br>
 
