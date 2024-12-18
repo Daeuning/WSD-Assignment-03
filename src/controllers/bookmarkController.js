@@ -2,6 +2,19 @@ const JobStatistics = require('../models/JobStatistics');
 const Bookmark = require('../models/Bookmark');
 const { successResponse, errorResponse } = require('../views/userView');
 
+// 북마크 활성/비활성 기능(토글)
+/**
+ * @function toggleBookmark
+ * @description 특정 공고에 대한 북마크 등록 및 해제를 토글하는 기능
+ * @param {Object} req - 요청 객체 (Express)
+ * @param {Object} req.body - 요청 본문
+ * @param {string} req.body.job_id - 북마크할 공고의 ID
+ * @param {Object} req.user - 인증된 사용자 정보
+ * @param {string} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체 (Express)
+ * @returns {Object} JSON 응답
+ * @throws {Error} 데이터베이스 작업 실패 또는 서버 오류 발생 시 예외 발생
+ */
 exports.toggleBookmark = async (req, res) => {
   try {
     const { job_id } = req.body;
@@ -56,6 +69,22 @@ exports.toggleBookmark = async (req, res) => {
   }
 };
 
+// 북마크 리스트 보기
+/**
+ * @function getBookmarks
+ * @description 사용자의 북마크된 공고 목록을 페이지네이션 및 정렬 옵션을 통해 조회
+ * @param {Object} req - 요청 객체 (Express)
+ * @param {Object} req.query - 요청 쿼리 파라미터
+ * @param {number} [req.query.page=1] - 조회할 페이지 번호 (기본값: 1)
+ * @param {number} [req.query.limit=10] - 페이지당 표시할 항목 수 (기본값: 10)
+ * @param {string} [req.query.sort='created_at'] - 정렬 기준 필드 (기본값: 'created_at')
+ * @param {string} [req.query.order='desc'] - 정렬 방향 ('asc' 또는 'desc', 기본값: 'desc')
+ * @param {Object} req.user - 인증된 사용자 정보
+ * @param {string} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체 (Express)
+ * @returns {Object} JSON 응답
+ * @throws {Error} 데이터베이스 작업 실패 또는 서버 오류 발생 시 예외 발생
+ */
 exports.getBookmarks = async (req, res) => {
   try {
     const { page = 1, limit = 10, sort = 'created_at', order = 'desc' } = req.query;

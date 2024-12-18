@@ -4,6 +4,18 @@ const JobStatistics = require('../models/JobStatistics');
 const { successResponse, errorResponse } = require('../views/applicationView');
 
 // 지원하기
+/**
+ * @function applyJob
+ * @description 사용자가 특정 공고에 지원하는 기능
+ * @param {Object} req - 요청 객체 (Express)
+ * @param {Object} req.body - 요청 본문
+ * @param {string} req.body.jobId - 지원하려는 공고 ID
+ * @param {Object} req.user - 인증된 사용자 정보
+ * @param {string} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체 (Express)
+ * @returns {Object} JSON 응답
+ * @throws {Error} 서버 오류 또는 데이터베이스 작업 실패 시 예외 발생
+ */
 exports.applyJob = async (req, res) => {
   try {
     const { jobId } = req.body;
@@ -49,6 +61,19 @@ exports.applyJob = async (req, res) => {
 
 
 // 지원 내역 조회
+/**
+ * @function getApplications
+ * @description 사용자의 지원 내역을 조회하는 기능
+ * @param {Object} req - 요청 객체 (Express)
+ * @param {Object} req.query - 요청 쿼리 파라미터
+ * @param {string} [req.query.status] - 필터링할 지원 상태 (예: '지원중')
+ * @param {string} [req.query.sort='appliedAt'] - 정렬 기준 (기본값: 'appliedAt')
+ * @param {Object} req.user - 인증된 사용자 정보
+ * @param {string} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체 (Express)
+ * @returns {Object} JSON 응답
+ * @throws {Error} 서버 오류 또는 데이터베이스 작업 실패 시 예외 발생
+ */
 exports.getApplications = async (req, res) => {
   try {
     const { status, sort = 'appliedAt' } = req.query; // 상태 필터링 및 정렬 기준
@@ -77,6 +102,18 @@ exports.getApplications = async (req, res) => {
 };
 
 // 지원 취소
+/**
+ * @function cancelApplication
+ * @description 사용자가 특정 지원 내역을 취소하는 기능
+ * @param {Object} req - 요청 객체 (Express)
+ * @param {Object} req.params - 요청 경로 매개변수
+ * @param {string} req.params.id - 취소할 지원 ID
+ * @param {Object} req.user - 인증된 사용자 정보
+ * @param {string} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체 (Express)
+ * @returns {Object} JSON 응답
+ * @throws {Error} 서버 오류 또는 데이터베이스 작업 실패 시 예외 발생
+ */
 exports.cancelApplication = async (req, res) => {
   try {
     const { id } = req.params; // 지원 ID

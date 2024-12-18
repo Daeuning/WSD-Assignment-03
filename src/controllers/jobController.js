@@ -7,6 +7,13 @@ const JobReview = require('../models/JobReview');
 const { successResponse, errorResponse } = require('../views/jobView');
 
 // 검색 기록 저장 함수
+/**
+ * @function saveSearchHistory
+ * @description 사용자 검색 기록을 저장합니다.
+ * @param {string} userId - 사용자 ID
+ * @param {string} keyword - 검색어
+ * @returns {void}
+ */
 const saveSearchHistory = async (userId, keyword) => {
   try {
     if (!userId) return; // userId가 없는 경우 기록하지 않음
@@ -35,6 +42,12 @@ const saveSearchHistory = async (userId, keyword) => {
 };
 
 // 공고 목록 조회 (필터링 + 페이지네이션 + 정렬 + 검색)
+/**
+ * @function getJobs
+ * @description 공고 목록을 조회합니다. 필터링, 페이지네이션, 정렬, 검색 기능을 제공합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ */
 exports.getJobs = async (req, res) => {
   try {
     // Query 파라미터 받기
@@ -134,7 +147,13 @@ exports.getJobs = async (req, res) => {
   }
 };
 
-
+// 공고 id로 상세 정보 조회
+/**
+ * @function getJobById
+ * @description 특정 공고의 상세 정보를 조회합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ */
 exports.getJobById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -176,7 +195,14 @@ exports.getJobById = async (req, res) => {
   }
 };
 
-
+// 공고 등록
+/**
+ * @function createJob
+ * @description 새로운 채용 공고를 생성하고 필요시 회사 정보를 생성합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ */
 exports.createJob = async (req, res) => {
   try {
     const {
@@ -245,6 +271,13 @@ exports.createJob = async (req, res) => {
 
 
 // 공고 수정
+/**
+ * @function updateJob
+ * @description 기존 채용 공고를 수정합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ */
 exports.updateJob = async (req, res) => {
   try {
     const { id } = req.params; // 공고 ID
@@ -313,6 +346,13 @@ exports.updateJob = async (req, res) => {
 
 
 // 공고 삭제
+/**
+ * @function deleteJob
+ * @description 특정 공고를 삭제하고 관련 통계 및 리뷰를 제거합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ */
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;
@@ -343,6 +383,13 @@ exports.deleteJob = async (req, res) => {
 
 
 // 리뷰 작성 기능
+/**
+ * @function createReview
+ * @description 특정 공고에 대한 리뷰를 작성합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ */
 exports.createReview = async (req, res) => {
   try {
     const { id } = req.params; // 공고 ID
@@ -384,6 +431,13 @@ exports.createReview = async (req, res) => {
 };
 
 // 특정 공고의 리뷰 조회
+/**
+ * @function getJobReviews
+ * @description 특정 공고의 리뷰를 조회합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ */
 exports.getJobReviews = async (req, res) => {
   try {
     const { id } = req.params; // 공고 ID 가져오기
