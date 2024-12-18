@@ -1,8 +1,18 @@
 const mongoose = require('mongoose');
 const SearchHistory = require('../models/SearchHistory');
-const { successResponse, errorResponse } = require('../views/searchView');
+const { successResponse, errorResponse } = require('../views/responseView');
 
 // 상위 3개 검색 키워드 반환
+/**
+ * @function getTopSearchKeywords
+ * @description 특정 사용자의 상위 3개 검색 키워드를 반환합니다.
+ * @param {Object} req - 요청 객체
+ * @param {Object} req.user - JWT 미들웨어를 통해 전달된 사용자 정보
+ * @param {Object} req.user.userId - 사용자 ID
+ * @param {Object} res - 응답 객체
+ * @returns {void}
+ * @throws {Error} - 예외 발생 시 에러 메시지와 함께 실패 응답 반환
+ */
 exports.getTopSearchKeywords = async (req, res) => {
   try {
     const userId = req.user.userId; // JWT 미들웨어에서 전달된 userId

@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
-// JobStatistics Schema 정의
+/**
+ * JobStatistics 스키마
+ * @typedef {Object} JobStatistics
+ * @property {mongoose.Schema.Types.ObjectId} job_id - 통계가 연결된 공고 ID (Job 모델 참조)
+ * @property {Number} views - 조회 수
+ * @property {Number} applications - 지원자 수
+ * @property {Number} bookmark_count - 북마크 수
+ * @property {Number} favorite_count - 관심 공고 수
+ */
 const JobStatisticsSchema = new mongoose.Schema({
   job_id: {
     type: mongoose.Schema.Types.ObjectId,

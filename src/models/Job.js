@@ -1,6 +1,21 @@
 const mongoose = require('mongoose');
 
-// Job Schema 정의
+/**
+ * Job 스키마
+ * @typedef {Object} Job
+ * @property {String} title - 공고 제목
+ * @property {mongoose.Schema.Types.ObjectId} company - 회사 ID (Company 모델 참조)
+ * @property {String} link - 공고 상세 페이지 링크
+ * @property {String} location - 근무지
+ * @property {String} experience - 경력 요구사항
+ * @property {String} education - 학력 요구사항
+ * @property {String} employment_type - 고용 형태 (정규직, 계약직 등)
+ * @property {String} job_tag - 공고 태그
+ * @property {Array<String>} stack_tags - 기술 스택 태그 배열
+ * @property {Date} deadline - 마감일
+ * @property {Date} created_at - 공고 생성 날짜
+ * @property {mongoose.Schema.Types.ObjectId} statistics - 통계 ID (Statistics 모델 참조)
+ */
 const JobSchema = new mongoose.Schema(
   {
     title: {
