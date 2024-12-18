@@ -55,3 +55,52 @@ exports.toggleBookmark = async (req, res) => {
     errorResponse(res, error.message, '북마크 처리 실패');
   }
 };
+
+exports.getBookmarks = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, sort = 'created_at', order = 'desc' } = req.query;
+
+    // 페이지네이션 설정
+    const currentPage = Math.max(1, parseInt(page));
+    const pageSize = Math.max(1, parseInt(limit));
+    const skip = (currentPage - 1) * pageSize;
+
+    // 정렬 옵션 설정
+    const sortOptions = {};
+    sortOptions[sort] = order === 'asc' ? 1 : -1;
+
+    // 북마크 목록 조회
+    const bookmarks = await Bookmark.find({ user_id: req.user.userId })
+      .populate({
+        path: 'jobs.job_info.job_id',
+        select: 'title company deadline',
+        populate: { path: 'company', select: 'company_name' },
+      })
+      .sort(sortOptions) // 정렬 적용
+      .skip(skip) // 페이지 시작점
+      .limit(pageSize); // 페이지 크기
+
+    // 총 북마크 수
+    const totalBookmarks = await Bookmark.aggregate([
+      { $match: { user_id: req.user.userId } },
+      { $project: { jobs: { $size: "$jobs" } } },
+    ]);
+
+    const totalItems = totalBookmarks[0]?.jobs || 0;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // 응답 반환
+    successResponse(res, {
+      jobs: bookmarks[0]?.jobs || [],
+      pagination: {
+        currentPage,
+        totalPages,
+        totalItems,
+        pageSize,
+      },
+    }, '북마크 목록 조회 성공');
+  } catch (error) {
+    console.error('북마크 목록 조회 에러:', error);
+    errorResponse(res, error.message, '북마크 목록 조회 실패');
+  }
+};
