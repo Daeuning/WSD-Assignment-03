@@ -1,7 +1,7 @@
 const Application = require('../models/Application');
 const Job = require('../models/Job');
 const JobStatistics = require('../models/JobStatistics');
-const { successResponse, errorResponse } = require('../views/applicationView');
+const { successResponse, errorResponse } = require('../views/responseView');
 
 // 지원하기
 /**

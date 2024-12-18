@@ -1,6 +1,6 @@
 const JobStatistics = require('../models/JobStatistics');
 const Bookmark = require('../models/Bookmark');
-const { successResponse, errorResponse } = require('../views/userView');
+const { successResponse, errorResponse } = require('../views/responseView');
 
 // 북마크 활성/비활성 기능(토글)
 /**

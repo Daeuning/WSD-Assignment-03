@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const SearchHistory = require('../models/SearchHistory');
-const { successResponse, errorResponse } = require('../views/searchView');
+const { successResponse, errorResponse } = require('../views/responseView');
 
 // 상위 3개 검색 키워드 반환
 /**

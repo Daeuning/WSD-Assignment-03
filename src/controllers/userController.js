@@ -2,7 +2,7 @@ const User = require('../models/User');
 const JobStatistics = require('../models/JobStatistics');
 const Favorite = require('../models/Favorite');
 const Bookmark = require('../models/Bookmark');
-const { successResponse, errorResponse } = require('../views/userView');
+const { successResponse, errorResponse } = require('../views/responseView');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 

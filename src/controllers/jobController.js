@@ -4,7 +4,7 @@ const Company = require('../models/Company');
 const SearchHistory = require('../models/SearchHistory');
 const JobStatistics = require('../models/JobStatistics');
 const JobReview = require('../models/JobReview');
-const { successResponse, errorResponse } = require('../views/jobView');
+const { successResponse, errorResponse } = require('../views/responseView');
 
 // 검색 기록 저장 함수
 /**
