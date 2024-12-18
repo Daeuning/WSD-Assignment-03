@@ -1,3 +1,13 @@
+Not all input has been taken into account at your final specification.
+Here's the report: 
+
+
+ Error in ./src/routes/jobRoutes.js :
+YAMLSemanticError: Nested mappings are not allowed in compact mappings at line 30, column 22:
+
+        description: 급여 범위 필터링 (예: 3000-5000)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^…
+
 Swagger 문서: http://113.198.66.75:18027/api-docs
 MongoDB 연결 성공
 Server is running at http://113.198.66.75:80
