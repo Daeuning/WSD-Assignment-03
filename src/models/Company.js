@@ -1,6 +1,15 @@
 const mongoose = require('mongoose');
 
-// Company Schema 정의
+/**
+ * Company 스키마
+ * @typedef {Object} Company
+ * @property {String} company_name - 회사 이름 (중복 불가, 필수 입력)
+ * @property {String} industry - 회사 업종 (필수 입력)
+ * @property {String} website - 회사 웹사이트 (선택 입력)
+ * @property {String} address - 회사 주소 (필수 입력)
+ * @property {String} ceo_name - 회사 대표자 이름 (기본값: 'Unknown')
+ * @property {String} business_description - 회사 사업 설명 (선택 입력)
+ */
 const CompanySchema = new mongoose.Schema(
   {
     company_name: {
