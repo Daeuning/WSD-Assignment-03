@@ -330,7 +330,7 @@ PORT=80
 ```
 
 ### 5. 크롤링 데이터 삽입
-crawled_data.json이 루트 디렉토리에 있는지 확인하고, 다음 명령어를 입력하여 DB에 데이터를 삽입합니다
+`crawled_data.json`이 루트 디렉토리에 있는지 확인하고, 다음 명령어를 입력하여 DB에 데이터를 삽입합니다
 ```
 node insertCrawledData.js
 ```
