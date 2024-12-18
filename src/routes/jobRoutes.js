@@ -35,7 +35,7 @@ const router = express.Router();
  *         example: "3년차"
  *       - in: query
  *         name: salary
- *         description: 급여 범위 필터링 (예: 3000-5000)
+ *         description: 급여 범위 필터링
  *         schema:
  *           type: string
  *         example: "3000-5000"
