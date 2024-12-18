@@ -25,15 +25,3 @@ Authenticated User: {
   iat: 1734452447,
   exp: 1734538847
 }
-Decoded Token: {
-  userId: '67616742cfd1907d2d9acbf3',
-  email: 'catcat@example.com',
-  iat: 1734452447,
-  exp: 1734538847
-}
-Authenticated User: {
-  userId: '67616742cfd1907d2d9acbf3',
-  email: 'catcat@example.com',
-  iat: 1734452447,
-  exp: 1734538847
-}
