@@ -1,5 +1,5 @@
 // errorHandler.js
-const { CustomError } = require('./errors');
+const { CustomError } = require('./error');
 const logger = require('./logger');
 
 const errorHandler = (err, req, res, next) => {

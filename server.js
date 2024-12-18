@@ -9,7 +9,7 @@ const bookmarkRoutes = require('./src/routes/bookmarkRoutes');
 const swaggerSpec = require('./src/config/swagger');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./src/middlewares/errorHandler');
-const { NotFoundError } = require('./src/middlewares/errors');
+const { NotFoundError } = require('./src/middlewares/error');
 const logger = require('./src/middlewares/logger');
 require('dotenv').config(); // dotenv 설정
 
