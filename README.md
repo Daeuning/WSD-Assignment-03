@@ -239,6 +239,65 @@ WSD-ASSIGNMENT-03/
 }
 ```
 
+<br>
+
+## 📚 API Endpoints
+
+### **Authentication (Auth)**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `POST`   | `/auth/register`      | 사용자 회원가입                 | None                      |
+| `POST`   | `/auth/login`         | 사용자 로그인 및 JWT 토큰 발급   | None                      |
+| `POST`   | `/auth/refresh`       | Refresh 토큰을 통해 토큰 갱신   | None                      |
+| `PUT`    | `/auth/profile`       | 회원 정보 수정                 | `Authorization: Bearer`   |
+| `GET`    | `/auth/user-info`     | 인증된 사용자 정보 조회         | `Authorization: Bearer`   |
+| `DELETE` | `/auth/delete`        | 회원 탈퇴                      | `Authorization: Bearer`   |
+
+---
+
+### **Applications**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `POST`   | `/applications`       | 공고에 지원                    | `Authorization: Bearer`   |
+| `GET`    | `/applications`       | 지원 내역 조회                 | `Authorization: Bearer`   |
+| `DELETE` | `/applications/{id}`  | 특정 지원 취소                 | `Authorization: Bearer`   |
+
+---
+
+### **Jobs**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `GET`    | `/jobs`               | 공고 목록 조회 (필터 및 정렬)   | `Authorization: Bearer`   |
+| `GET`    | `/jobs/{id}`          | 특정 공고 상세 조회            | None                      |
+| `POST`   | `/jobs`               | 새로운 공고 등록               | `Authorization: Bearer`   |
+| `PUT`    | `/jobs/{id}`          | 기존 공고 수정                 | `Authorization: Bearer`   |
+| `DELETE` | `/jobs/{id}`          | 기존 공고 삭제                 | `Authorization: Bearer`   |
+| `POST`   | `/jobs/{id}/reviews`  | 특정 공고에 리뷰 작성          | `Authorization: Bearer`   |
+| `GET`    | `/jobs/{id}/reviews`  | 특정 공고 리뷰 조회            | None                      |
+
+---
+
+### **Bookmarks**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `POST`   | `/bookmarks/toggle`   | 공고 북마크 토글               | `Authorization: Bearer`   |
+| `GET`    | `/bookmarks`          | 북마크 목록 조회               | `Authorization: Bearer`   |
+
+---
+
+### **Favorites**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `POST`   | `/favorites/toggle`   | 관심 공고 토글                 | `Authorization: Bearer`   |
+
+---
+
+### **Search**
+| Method   | Endpoint              | Description                    | Required Headers          |
+|----------|-----------------------|--------------------------------|---------------------------|
+| `GET`    | `/search/top-keywords`| 상위 3개 검색 키워드 조회      | `Authorization: Bearer`   |
+
+---
 
 <br>
 
