@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+/**
+ * Favorite 스키마
+ * @typedef {Object} Favorite
+ * @property {mongoose.Schema.Types.ObjectId} user_id - 사용자 ID (User 모델 참조)
+ * @property {Array<Object>} jobs - 관심 공고 배열
+ * @property {Object} jobs.job_info - 관심 공고의 세부 정보
+ * @property {mongoose.Schema.Types.ObjectId} jobs.job_info.job_id - 관심 등록된 공고 ID (Job 모델 참조)
+ * @property {Date} jobs.job_info.created_at - 관심 등록 날짜 (기본값: 현재 시간)
+ */
 const FavoriteSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
