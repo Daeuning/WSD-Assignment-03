@@ -178,4 +178,34 @@ router.get('/user-info', authenticate, userController.getUserInfo);
  */
 router.delete('/delete', authenticate, userController.deleteUser);
 
+/**
+ * @swagger
+ * /favorites/toggle:
+ *   post:
+ *     summary: 관심 공고 토글
+ *     description: 관심 공고를 등록하거나 해제합니다.
+ *     tags:
+ *       - Favorites
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               job_id:
+ *                 type: string
+ *                 description: 관심 등록할 공고 ID
+ *     responses:
+ *       200:
+ *         description: 관심 공고 상태가 변경되었습니다.
+ *       400:
+ *         description: 잘못된 요청
+ *       500:
+ *         description: 서버 오류
+ */
+router.post('/favorite', authenticate, userController.toggleFavorite);
+
 module.exports = router;
